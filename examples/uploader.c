@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
             .data_dir = "./uploader-data",
             .log_level = "INFO",
             .bootstrap_node = NULL,
+            .nat = "none",
     };
 
     STORAGE_NODE node = e_storage_new(cfg);
@@ -27,9 +28,7 @@ int main(int argc, char *argv[]) {
     char *cid = e_storage_upload(node, argv[1], progress);
     char *spr = e_storage_spr(node);
 
-    printf("\nCID: %s\n", cid);
-    printf("SPR: %s\n", spr);
-
+    printf("Run: downloader %s %s ./output-file\n", spr, cid);
     printf("\nPress Enter to exit\n");
     getchar();
 

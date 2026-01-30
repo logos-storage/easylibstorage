@@ -9,6 +9,7 @@ typedef struct {
     char *data_dir;
     char *log_level;
     char *bootstrap_node;
+    char *nat;
 } node_config;
 
 typedef void (*progress_callback)(int total, int complete, int status);

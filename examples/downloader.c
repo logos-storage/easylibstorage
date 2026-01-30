@@ -19,6 +19,7 @@ int main(int argc, char *argv[]) {
             .data_dir = "./downloader-data",
             .log_level = "INFO",
             .bootstrap_node = argv[1],
+            .nat = "none",
     };
 
     STORAGE_NODE node = e_storage_new(cfg);

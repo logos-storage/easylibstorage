@@ -142,8 +142,8 @@ STORAGE_NODE e_storage_new(node_config config) {
     }
 
     // Build JSON config string.
-    // Format: {"api-port":N,"disc-port":N,"data-dir":"...","log-level":"...","bootstrap-node":["..."]}
-    char json[2048];
+    // Format: {"api-port":N,"disc-port":N,"data-dir":"...","log-level":"...","bootstrap-node":["..."], "nat": "..."}
+    char json[3096];
     int pos = 0;
 
     pos += snprintf(json + pos, sizeof(json) - pos, "{\"api-port\":%d,\"disc-port\":%d", config.api_port,
@@ -159,6 +159,10 @@ STORAGE_NODE e_storage_new(node_config config) {
 
     if (config.bootstrap_node) {
         pos += snprintf(json + pos, sizeof(json) - pos, ",\"bootstrap-node\":[\"%s\"]", config.bootstrap_node);
+    }
+
+    if (config.nat) {
+        pos += snprintf(json + pos, sizeof(json) - pos, ",\"nat\":\"%s\"", config.nat);
     }
 
     snprintf(json + pos, sizeof(json) - pos, "}");
