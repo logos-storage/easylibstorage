@@ -37,10 +37,9 @@ e_storage_start(node);
 
 // Upload a file
 char *cid = e_storage_upload(node, "/path/to/file.txt", progress_cb);
-free(cid);
-
 // Download a file
 e_storage_download(node, cid, "/path/to/output.txt", progress_cb);
+free(cid);
 
 // Cleanup
 e_storage_stop(node);

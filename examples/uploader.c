@@ -29,6 +29,9 @@ int main(int argc, char *argv[]) {
     char *spr = e_storage_spr(node);
 
     printf("Run: downloader %s %s ./output-file\n", spr, cid);
+    free(cid);
+    free(spr);
+
     printf("\nPress Enter to exit\n");
     getchar();
 
