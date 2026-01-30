@@ -1,12 +1,6 @@
 # easystorage
 
-A simplified C wrapper around [libstorage](https://github.com/status-im/logos-storage-nim), providing an easy-to-use API for distributed file storage operations.
-
-## Features
-
-- Simple node lifecycle management (create, start, stop, destroy)
-- File upload with progress callback
-- File download by CID with progress callback
+A simplified, higher level C wrapper around [libstorage](https://github.com/status-im/logos-storage-nim) built to showcase it. Allows filesharing in the Logos Storage network. Comes with an example console application to interact with it.
 
 ## Prerequisites
 
