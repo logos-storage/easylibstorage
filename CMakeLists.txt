@@ -2,7 +2,9 @@ cmake_minimum_required(VERSION 3.14)
 project(storageconsole C)
 set(CMAKE_C_STANDARD 11)
 
-add_executable(storageconsole main.c
+add_executable(storageconsole
+        main.c
+        easylibstorage.c
         easylibstorage.h
 )
 
@@ -28,3 +30,18 @@ else()
     message(WARNING "libstorage not found. Build or provide it before linking.")
 endif()
 
+# --- Tests ---
+enable_testing()
+
+add_executable(test_runner
+        tests/test_runner.c
+        easylibstorage.c
+        tests/mock_libstorage.c
+)
+
+target_include_directories(test_runner PRIVATE
+        "${CMAKE_SOURCE_DIR}"
+        "${LOGOS_STORAGE_NIM_ROOT}/library"
+)
+
+add_test(NAME easylibstorage_tests COMMAND test_runner)

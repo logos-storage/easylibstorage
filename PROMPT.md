@@ -7,7 +7,7 @@ The headers for `libstorage` are located at `/home/giuliano/Work/Status/logos-st
 
 The code for libstorage is located at `home/giuliano/Work/Status/logos-storage-nim/library`.
 
-There are examples for how libstorage can be used in `/home/giuliano/Work/Status/logos-storage-nim/examples/c/examples.c`.
+There are examples for how libstorage can be used in `/home/giuliano/Work/Status/logos-storage-nim/examples/c/storage.c`.
 
 # Development Process (TDD)
 You MUST follow a Test Driven Development approach. Since no test environment exists yet, your FIRST task is to:
@@ -22,6 +22,8 @@ Then, for *each* function in `easylibstorage.h`:
 **CRITICAL**: This refactoring step is VERY IMPORTANT. You MUST look for ways to simplify, deduplicate, and coalesce code here, WITHOUT OVERCOMPLICATING. **SIMPLICITY IS KEY AND YOUR GUIDING PRINCIPLE.**
 
 # API Implementation Details
+- **Configuration JSON.** The keys described in the node_config struct should be passed as kebab-case into the config JSON string. See an example
+in the `storage.c` file. `bootstrap-node` must be passed as a string array.
 - **Memory Management**: Clearly document who owns returned pointers (e.g., CIDs). Ensure no memory leaks.
 - **Log Levels**: Map the `char *log_level` in the config to the internal `enum log_level`.
 - **Download Return**: Note that `e_storage_download` currently returns `STORAGE_NODE` in the header. If this is a mistake, change it to return `int` (status code) and update the header.
