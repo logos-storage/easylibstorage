@@ -35,7 +35,7 @@ Wire the API into `main.c`.
 
 # Commands to Support
 - `help`: Prints the help message.
-- `start [API PORT] [DISC PORT] [BOOTSTRAP NODE]`: Creates and starts the node (all parameters mandatory).
+- `start [API PORT] [DISC PORT] [DATA DIR] [BOOTSTRAP NODE]`: Creates and starts the node (all parameters mandatory).
 - `stop`: Stops and destroys the node.
 - `upload [LOCAL PATH]`: Uploads a local file; shows progress; prints CID.
 - `download [CID] [LOCAL PATH]`: Downloads remote CID; shows progress.

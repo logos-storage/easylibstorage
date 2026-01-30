@@ -43,17 +43,18 @@ void cmd_start(char *args, console *c) {
     }
 
     int api_port = 0, disc_port = 0;
+    char datadir[2048] = {0};
     char bootstrap[2048] = {0};
 
-    if (!args || sscanf(args, "%d %d %2047s", &api_port, &disc_port, bootstrap) < 2) {
-        printf("Usage: start [API_PORT] [DISC_PORT] [BOOTSTRAP_NODE]\n");
+    if (!args || sscanf(args, "%d %d %2047s %2047s", &api_port, &disc_port, datadir, bootstrap) < 3) {
+        printf("Usage: start [API_PORT] [DISC_PORT] [DATA_DIR] [BOOTSTRAP_NODE]\n");
         return;
     }
 
     node_config cfg = {0};
     cfg.api_port = api_port;
     cfg.disc_port = disc_port;
-    cfg.data_dir = "./data";
+    cfg.data_dir = datadir;
     cfg.log_level = "INFO";
     cfg.bootstrap_node = bootstrap[0] ? bootstrap : NULL;
 
@@ -144,13 +145,14 @@ void cmd_quit(char *args, console *c) {
         e_storage_destroy(c->ctx);
         c->ctx = NULL;
     }
+    printf("Quitting...\n");
     exit(0);
 }
 
 static const struct command commands[] = {
     {"help", "prints this help message", cmd_help},
     {"quit", "quits this program", cmd_quit},
-    {"start", "[API_PORT] [DISC_PORT] [BOOTSTRAP_NODE] creates and starts a node", cmd_start},
+    {"start", "[API_PORT] [DISC_PORT] [DATA_DIR] [BOOTSTRAP_NODE] creates and starts a node", cmd_start},
     {"stop", "stops and destroys the node", cmd_stop},
     {"upload", "[PATH] uploads a file to the node", cmd_upload},
     {"download", "[CID] [PATH] downloads content to a file", cmd_download},
@@ -164,6 +166,8 @@ int main(void) {
     int i;
 
     c.ctx = NULL;
+
+    printf("Welcome to storageconsole. Type 'help' for a list of commands.\n");
 
     while (1) {
         printf("> ");
