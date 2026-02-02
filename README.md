@@ -1,6 +1,7 @@
 # libeasystorage
 
-A simplified, higher level C wrapper around [libstorage](https://github.com/status-im/logos-storage-nim) built to showcase it. Allows filesharing in the Logos Storage network. Comes with an example console application to interact with it.
+A simplified, higher level C wrapper around [libstorage](https://github.com/status-im/logos-storage-nim). Includes
+examples showing how to implement simple filesharing apps.
 
 ## Prerequisites
 

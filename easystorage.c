@@ -1,4 +1,5 @@
 #include "easystorage.h"
+#include "ini.h"
 #include "libstorage.h"
 
 #include <pthread.h>
@@ -11,6 +12,13 @@
 #define MAX_RETRIES 250
 #define POLL_INTERVAL_US (100 * 1000)
 #define DEFAULT_CHUNK_SIZE (64 * 1024)
+
+const node_config DEFAULT_STORAGE_NODE_CONFIG = {.api_port = 8080,
+                                                 .disc_port = 8090,
+                                                 .data_dir = "./data",
+                                                 .log_level = "INFO",
+                                                 .bootstrap_node = NULL,
+                                                 .nat = "auto"};
 
 typedef struct {
     int ret;
@@ -30,8 +38,10 @@ static resp *resp_alloc(void) {
 }
 
 static void resp_destroy(resp *r) {
-    if (!r) return;
-    if (r->msg) free(r->msg);
+    if (!r)
+        return;
+    if (r->msg)
+        free(r->msg);
     free(r);
 }
 
@@ -44,7 +54,8 @@ static void resp_wait(resp *r) {
 // Callback for simple (non-progress) async operations.
 static void on_complete(int ret, const char *msg, size_t len, void *userData) {
     resp *r = userData;
-    if (!r) return;
+    if (!r)
+        return;
 
     pthread_mutex_lock(&mutex);
     if (r->unreferenced) {
@@ -70,10 +81,10 @@ static void on_complete(int ret, const char *msg, size_t len, void *userData) {
 // Callback for operations that report progress before completing.
 static void on_progress(int ret, const char *msg, size_t len, void *userData) {
     resp *r = userData;
-    if (!r) return;
+    if (!r)
+        return;
 
     pthread_mutex_lock(&mutex);
-
     if (r->unreferenced) {
         resp_destroy(r);
         pthread_mutex_unlock(&mutex);
@@ -281,4 +292,51 @@ int e_storage_download(STORAGE_NODE node, const char *cid, const char *filepath,
     }
 
     return ret;
+}
+
+static int handler(void *user, const char *section, const char *name, const char *value) {
+    node_config *cfg = (node_config *) user;
+#define MATCH(n) strcmp(section, "easystorage") == 0 && strcmp(name, n) == 0
+    if (MATCH("bootstrap-node")) {
+        cfg->bootstrap_node = strdup(value);
+    } else if (MATCH("data-dir")) {
+        cfg->data_dir = strdup(value);
+    } else if (MATCH("log-level")) {
+        cfg->log_level = strdup(value);
+    } else if (MATCH("nat")) {
+        cfg->nat = strdup(value);
+    } else if (MATCH("api-port")) {
+        cfg->api_port = atoi(value);
+    } else if (MATCH("disc-port")) {
+        cfg->disc_port = atoi(value);
+    } else {
+        return RET_OK;
+    }
+
+    return RET_ERR;
+}
+
+int e_storage_read_config(char *filepath, node_config *conf) { return ini_parse(filepath, handler, conf); }
+int e_storage_read_config_file(FILE *fp, node_config *config) { return ini_parse_file(fp, handler, config); }
+
+void e_storage_free_config(node_config *conf) {
+    if (!conf) {
+        return;
+    }
+    if (conf->bootstrap_node) {
+        free(conf->bootstrap_node);
+        conf->bootstrap_node = NULL;
+    }
+    if (conf->data_dir) {
+        free(conf->data_dir);
+        conf->data_dir = NULL;
+    }
+    if (conf->log_level) {
+        free(conf->log_level);
+        conf->log_level = NULL;
+    }
+    if (conf->nat) {
+        free(conf->nat);
+        conf->nat = NULL;
+    }
 }

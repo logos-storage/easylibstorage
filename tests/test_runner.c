@@ -30,6 +30,14 @@ static node_config default_config(void) {
     return cfg;
 }
 
+FILE *write_to_temp(const char *contents) {
+    FILE *fp = tmpfile();
+    assert(fp != NULL);
+    assert(fwrite(contents, 1, strlen(contents), fp) == strlen(contents));
+    assert(fseek(fp, 0, SEEK_SET) == 0);
+    return fp;
+}
+
 // --- Tests ---
 
 static void test_new(void) {
@@ -147,6 +155,30 @@ static void test_full_lifecycle(void) {
     assert(e_storage_destroy(node) == RET_OK);
 }
 
+static void test_should_read_configuration_file(void) {
+    const char *conf = "[easystorage]                                    \n"
+                       "bootstrap-node=spr:CiUIAhIhA-VlcoiRm02KyIzrcTP   \n"
+                       "data-dir=/home/user/data-dir                     \n"
+                       "log-level=WARN                                   \n"
+                       "api-port=8081                                    \n"
+                       "disc-port=8091                                   \n"
+                       "nat=none                                         \n";
+
+    node_config cfg = DEFAULT_STORAGE_NODE_CONFIG;
+    FILE *cfg_file = write_to_temp(conf);
+    assert(e_storage_read_config_file(cfg_file, &cfg) == RET_OK);
+    fclose(cfg_file);
+
+    assert(strcmp(cfg.bootstrap_node, "spr:CiUIAhIhA-VlcoiRm02KyIzrcTP") == 0);
+    assert(strcmp(cfg.data_dir, "/home/user/data-dir") == 0);
+    assert(strcmp(cfg.log_level, "WARN") == 0);
+    assert(cfg.api_port == 8081);
+    assert(cfg.disc_port == 8091);
+    assert(strcmp(cfg.nat, "none") == 0);
+
+    e_storage_free_config(&cfg);
+}
+
 int main(void) {
     printf("Running easylibstorage tests...\n");
 
@@ -163,7 +195,8 @@ int main(void) {
     RUN_TEST(test_download_null);
     RUN_TEST(test_get_should_get_node_spr);
     RUN_TEST(test_full_lifecycle);
+    RUN_TEST(test_should_read_configuration_file);
 
     printf("\n%d/%d tests passed.\n", tests_passed, tests_run);
-    return (tests_passed == tests_run) ? 0 : 1;
+    return tests_passed == tests_run ? 0 : 1;
 }

@@ -1,6 +1,8 @@
 #ifndef EASYSTORAGE_H
 #define EASYSTORAGE_H
 
+#include <stdio.h>
+
 #define STORAGE_NODE void *
 
 typedef struct {
@@ -11,6 +13,8 @@ typedef struct {
     char *bootstrap_node;
     char *nat;
 } node_config;
+
+extern const node_config DEFAULT_STORAGE_NODE_CONFIG;
 
 typedef void (*progress_callback)(int total, int complete, int status);
 
@@ -29,5 +33,11 @@ char *e_storage_upload(STORAGE_NODE node, const char *filepath, progress_callbac
 
 // Downloads content identified by cid to filepath. Returns 0 on success.
 int e_storage_download(STORAGE_NODE node, const char *cid, const char *filepath, progress_callback cb);
+
+// Config handling utilities. Note that for e_storage_read_config and e_storage_read_config, the
+// caller is responsible for freeing the config object and its members.
+int e_storage_read_config(char *filepath, node_config *config);
+int e_storage_read_config_file(FILE *, node_config *config);
+void e_storage_free_config(node_config *config);
 
 #endif // EASYSTORAGE_H
