@@ -4,6 +4,8 @@
 #include <stdio.h>
 
 #define STORAGE_NODE void *
+#define RET_OK 0
+#define RET_ERR 1
 
 typedef struct {
     int api_port;
@@ -33,6 +35,9 @@ char *e_storage_upload(STORAGE_NODE node, const char *filepath, progress_callbac
 
 // Downloads content identified by cid to filepath. Returns 0 on success.
 int e_storage_download(STORAGE_NODE node, const char *cid, const char *filepath, progress_callback cb);
+
+// Deletes a previously uploaded file from the node.
+int e_storage_delete(STORAGE_NODE node, const char *cid);
 
 // Config handling utilities. Note that for e_storage_read_config and e_storage_read_config, the
 // caller is responsible for freeing the config object and its members.

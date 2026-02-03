@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include "easystorage.h"
 
+void panic(const char *msg) {
+    fprintf(stderr, "Panic: %s\n", msg);
+    exit(1);
+}
+
 void progress(int total, int complete, int status) {
     printf("\r  %d / %d bytes", complete, total);
     fflush(stdout);
@@ -27,18 +32,25 @@ int main(int argc, char *argv[]) {
     char *filepath = argv[1];
 
     STORAGE_NODE node = e_storage_new(cfg);
-    e_storage_start(node);
+    if (node == NULL) panic("Failed to create node");
+    if (e_storage_start(node) != RET_OK) panic("Failed to start storage node");
 
     char *cid = e_storage_upload(node, filepath, progress);
+    if (cid == NULL) panic("Failed to upload file to node");
     char *spr = e_storage_spr(node);
+    if (spr == NULL) panic("Failed to obtain node's Signed Peer Record (SPR)");
 
     printf("Run: downloader %s %s ./output-file\n", spr, cid);
-    free(cid);
-    free(spr);
-
     printf("\nPress Enter to exit\n");
     getchar();
 
+    printf("Deleting file (this could take a while)...");
+    fflush(stdout);
+    if (e_storage_delete(node, cid) != RET_OK) panic("Failed to delete file");
+    printf("Done\n");
+
+    free(cid);
+    free(spr);
     e_storage_stop(node);
     e_storage_destroy(node);
 

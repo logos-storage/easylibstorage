@@ -122,6 +122,22 @@ static void test_download_null(void) {
     assert(ret == RET_ERR);
 }
 
+static void test_should_delete_file(void) {
+    node_config cfg = default_config();
+    STORAGE_NODE node = e_storage_new(cfg);
+    assert(node != NULL);
+    e_storage_start(node);
+
+    char *cid = e_storage_upload(node, "/tmp/test.txt", NULL);
+    assert(cid != NULL);
+    assert(strlen(cid) > 0);
+
+    assert(e_storage_delete(node, cid) == RET_OK);
+    // Non-existing files can't be deleted.
+    assert(e_storage_delete(node, cid) == RET_ERR);
+    free(cid);
+}
+
 static void test_get_should_get_node_spr(void) {
     node_config cfg = default_config();
     STORAGE_NODE node = e_storage_new(cfg);
@@ -193,6 +209,7 @@ int main(void) {
     RUN_TEST(test_upload_null);
     RUN_TEST(test_download);
     RUN_TEST(test_download_null);
+    RUN_TEST(test_should_delete_file);
     RUN_TEST(test_get_should_get_node_spr);
     RUN_TEST(test_full_lifecycle);
     RUN_TEST(test_should_read_configuration_file);

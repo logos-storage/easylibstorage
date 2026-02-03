@@ -3,8 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define FAKE_CID "zDvZRwzmAbCdEfGhIjKlMnOpQrStUvWxYz0123456789ABCD"
+
 // A fake context to return from storage_new.
 static int fake_ctx_data = 42;
+bool exists = false;
 
 void libstorageNimMain(void) {
     // no-op
@@ -70,9 +73,26 @@ int storage_upload_file(void *ctx, const char *sessionId, StorageCallback callba
     // Fire a progress callback first, then final OK with CID
     if (callback) {
         callback(RET_PROGRESS, "chunk", 5, userData);
-        const char *cid = "zDvZRwzmAbCdEfGhIjKlMnOpQrStUvWxYz0123456789ABCD";
+        const char *cid = FAKE_CID;
         callback(RET_OK, cid, strlen(cid), userData);
+        exists = true;
     }
+    return RET_OK;
+}
+
+int storage_delete(void *ctx, const char *cid, StorageCallback callback, void *userData) {
+    if (!ctx)
+        return RET_ERR;
+
+    if (callback) {
+        if (strcmp(cid, FAKE_CID) == 0 && exists) {
+            callback(RET_OK, "", 0, userData);
+            exists = false;
+        } else {
+            callback(RET_ERR, "Failed", 6, userData);
+        }
+    }
+
     return RET_OK;
 }
 

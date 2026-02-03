@@ -4,6 +4,11 @@
 #include <stdlib.h>
 #include "easystorage.h"
 
+void panic(const char *msg) {
+    fprintf(stderr, "Panic: %s\n", msg);
+    exit(1);
+}
+
 void progress(int total, int complete, int status) {
     printf("\r  %d / %d bytes", complete, total);
     fflush(stdout);
@@ -29,8 +34,8 @@ int main(int argc, char *argv[]) {
     };
 
     STORAGE_NODE node = e_storage_new(cfg);
-    e_storage_start(node);
-    e_storage_download(node, cid, filepath, progress);
+    if (e_storage_start(node) != RET_OK) panic("Failed to start storage node");
+    if (e_storage_download(node, cid, filepath, progress) != RET_OK) panic("Failed to download file");
     e_storage_stop(node);
     e_storage_destroy(node);
 }

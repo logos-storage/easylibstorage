@@ -9,7 +9,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#define MAX_RETRIES 250
+#define MAX_RETRIES 1000
 #define POLL_INTERVAL_US (100 * 1000)
 #define DEFAULT_CHUNK_SIZE (64 * 1024)
 
@@ -45,10 +45,12 @@ static void resp_destroy(resp *r) {
     free(r);
 }
 
-static void resp_wait(resp *r) {
-    for (int i = 0; i < MAX_RETRIES && r->ret == -1; i++) {
+static bool resp_wait(resp *r) {
+    int i;
+    for (i = 0; i < MAX_RETRIES && r->ret == -1; i++) {
         usleep(POLL_INTERVAL_US);
     }
+    return i == MAX_RETRIES;
 }
 
 // Callback for simple (non-progress) async operations.
@@ -119,13 +121,18 @@ static void on_progress(int ret, const char *msg, size_t len, void *userData) {
 // Returns RET_OK/RET_ERR. If dispatch_ret != RET_OK, returns RET_ERR immediately.
 // If **out is non-NULL, allocates a buffer and copies the content of
 // resp->msg onto it, which the caller must then free.
+// Manages deallocation of resp such that it only gets deallocated after both
+// this call returns AND the callback has run. Will leak memory if the call
+// succeeds but the callback then fails to run.
 static int call_wait(int dispatch_ret, resp *r, char **out) {
     if (dispatch_ret != RET_OK) {
         resp_destroy(r);
         return RET_ERR;
     }
 
-    resp_wait(r);
+    if (resp_wait(r)) {
+        fprintf(stderr, "CRITICAL: Call timed out!");
+    }
 
     pthread_mutex_lock(&mutex);
     int result = (r->ret == RET_OK) ? RET_OK : RET_ERR;
@@ -289,6 +296,18 @@ int e_storage_download(STORAGE_NODE node, const char *cid, const char *filepath,
 
     if (cb) {
         printf("\n");
+    }
+
+    return ret;
+}
+
+int e_storage_delete(STORAGE_NODE node, const char *cid) {
+    if (!node || !cid) return RET_ERR;
+
+    resp *r = resp_alloc();
+    int ret = call_wait(storage_delete(node, cid, on_complete, r), r, NULL);
+    if (ret != RET_OK) {
+        return RET_ERR;
     }
 
     return ret;
