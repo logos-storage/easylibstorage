@@ -37,5 +37,6 @@ int main(int argc, char *argv[]) {
     if (e_storage_start(node) != RET_OK) panic("Failed to start storage node");
     if (e_storage_download(node, cid, filepath, progress) != RET_OK) panic("Failed to download file");
     e_storage_stop(node);
+    e_storage_close(node);
     e_storage_destroy(node);
 }

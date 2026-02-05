@@ -25,6 +25,7 @@ STORAGE_NODE e_storage_new(node_config config);
 
 int e_storage_start(STORAGE_NODE node);
 int e_storage_stop(STORAGE_NODE node);
+int e_storage_close(STORAGE_NODE node);
 int e_storage_destroy(STORAGE_NODE node);
 
 // Retrieves the node's SPR (caller must free), or NULL on failure.

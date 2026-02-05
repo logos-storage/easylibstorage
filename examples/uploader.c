@@ -52,6 +52,7 @@ int main(int argc, char *argv[]) {
     free(cid);
     free(spr);
     e_storage_stop(node);
+    e_storage_close(node);
     e_storage_destroy(node);
 
     return 0;

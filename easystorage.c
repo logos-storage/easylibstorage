@@ -124,14 +124,15 @@ static void on_progress(int ret, const char *msg, size_t len, void *userData) {
 // Manages deallocation of resp such that it only gets deallocated after both
 // this call returns AND the callback has run. Will leak memory if the call
 // succeeds but the callback then fails to run.
-static int call_wait(int dispatch_ret, resp *r, char **out) {
+#define call_wait(dispatch_ret, r, out) call_wait_impl(__func__, __LINE__,  dispatch_ret, r, out)
+static int call_wait_impl(const char *caller_name, int caller_line, int dispatch_ret, resp *r, char **out) {
     if (dispatch_ret != RET_OK) {
         resp_destroy(r);
         return RET_ERR;
     }
 
     if (resp_wait(r)) {
-        fprintf(stderr, "CRITICAL: Call timed out!");
+        fprintf(stderr, "CRITICAL: Call timed out at %s, line %d\n", caller_name, caller_line);
     }
 
     pthread_mutex_lock(&mutex);
@@ -218,6 +219,13 @@ int e_storage_stop(STORAGE_NODE node) {
     return call_wait(storage_stop(node, (StorageCallback) on_complete, r), r, NULL);
 }
 
+int e_storage_close(STORAGE_NODE node) {
+    if (!node)
+        return RET_ERR;
+    resp *r = resp_alloc();
+    return call_wait(storage_close(node, (StorageCallback) on_complete, r), r, NULL);
+}
+
 int e_storage_destroy(STORAGE_NODE node) {
     if (!node)
         return RET_ERR;
@@ -302,7 +310,8 @@ int e_storage_download(STORAGE_NODE node, const char *cid, const char *filepath,
 }
 
 int e_storage_delete(STORAGE_NODE node, const char *cid) {
-    if (!node || !cid) return RET_ERR;
+    if (!node || !cid)
+        return RET_ERR;
 
     resp *r = resp_alloc();
     int ret = call_wait(storage_delete(node, cid, on_complete, r), r, NULL);
