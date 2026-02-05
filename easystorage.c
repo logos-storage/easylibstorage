@@ -229,13 +229,7 @@ int e_storage_close(STORAGE_NODE node) {
 int e_storage_destroy(STORAGE_NODE node) {
     if (!node)
         return RET_ERR;
-
-    // Close first (tolerate failure)
     resp *r = resp_alloc();
-    call_wait(storage_close(node, (StorageCallback) on_complete, r), r, NULL);
-
-    // Destroy
-    r = resp_alloc();
     return call_wait(storage_destroy(node, (StorageCallback) on_complete, r), r, NULL);
 }
 
