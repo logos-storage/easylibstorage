@@ -178,6 +178,8 @@ STORAGE_NODE e_storage_new(node_config config) {
 
     if (config.bootstrap_node) {
         pos += snprintf(json + pos, sizeof(json) - pos, ",\"bootstrap-node\":[\"%s\"]", config.bootstrap_node);
+    } else {
+        pos += snprintf(json + pos, sizeof(json) - pos, ",\"no-bootstrap-node\":true");
     }
 
     if (config.nat) {
