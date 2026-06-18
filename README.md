@@ -7,7 +7,7 @@ examples showing how to implement simple filesharing apps.
 
 - CMake 3.14+
 - C11 compiler
-- libstorage (build or get binary from [logos-storage-nim](https://github.com/status-im/logos-storage-nim))
+- libstorage v0.3.2 (build or get binary from [logos-storage-nim](https://github.com/status-im/logos-storage-nim))
 
 ## Building
 
