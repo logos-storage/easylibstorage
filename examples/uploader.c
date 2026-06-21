@@ -24,9 +24,9 @@ int main(int argc, char *argv[]) {
             .api_port = 8080,
             .disc_port = 9090,
             .data_dir = "./uploader-data",
-            .log_level = "INFO",
-            .bootstrap_node = NULL,
-            .nat = "none",
+            .log_level = "TRACE",
+            .bootstrap_node = "spr:CiUIAhIhApIj9p6zJDRbw2NoCo-tj98Y760YbppRiEpGIE1yGaMzEgIDARpJCicAJQgCEiECkiP2nrMkNFvDY2gKj62P3xjvrRhumlGISkYgTXIZozMQvcz8wQYaCwoJBAWhF3WRAnVEGgsKCQQFoRd1kQJ1RCpGMEQCIFZB84O_nzPNuViqEGRL1vJTjHBJ-i5ZDgFL5XZxm4HAAiB8rbLHkUdFfWdiOmlencYVn0noSMRHzn4lJYoShuVzlw",
+            .listen_addr = "/ip4/0.0.0.0/tcp/65032",
     };
 
     char *filepath = argv[1];
@@ -40,8 +40,8 @@ int main(int argc, char *argv[]) {
     char *spr = e_storage_spr(node);
     if (spr == NULL) panic("Failed to obtain node's Signed Peer Record (SPR)");
 
-    printf("Run: downloader %s %s ./output-file\n", spr, cid);
-    printf("\nPress Enter to exit\n");
+    printf("Run: ./build/downloader %s %s ./output-file\n", spr, cid);
+    printf("\nKeep running while downloading.\n\nPress Enter to exit when finished.\n");
     getchar();
 
     printf("Deleting file (this could take a while)...");

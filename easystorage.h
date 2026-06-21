@@ -13,6 +13,7 @@ typedef struct {
     char *data_dir;
     char *log_level;
     char *bootstrap_node;
+    char *listen_addr;
     char *nat;
 } node_config;
 

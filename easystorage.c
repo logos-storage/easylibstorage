@@ -182,6 +182,10 @@ STORAGE_NODE e_storage_new(node_config config) {
         pos += snprintf(json + pos, sizeof(json) - pos, ",\"no-bootstrap-node\":true");
     }
 
+    if (config.listen_addr) {
+        pos += snprintf(json + pos, sizeof(json) - pos, ",\"listen-addrs\":[\"%s\"]", config.listen_addr);
+    }
+
     if (config.nat) {
         pos += snprintf(json + pos, sizeof(json) - pos, ",\"nat\":\"%s\"", config.nat);
     }
